@@ -46,3 +46,10 @@ void Text::createTexture() {
         throw std::runtime_error(SDL_GetError());
     }
 }
+
+void Text::destroyTexture() {
+    if (m_texture) {
+        SDL_DestroyTexture(m_texture);
+        m_texture = nullptr;
+    }
+}
