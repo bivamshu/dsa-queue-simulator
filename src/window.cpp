@@ -3,3 +3,17 @@
 #include "SDL3/SDL_video.h"
 #include <stdexcept>
 #include <window.h>
+
+Window::Window(const std::string& title, int width, int height) {
+  m_window = SDL_CreateWindow(title.c_str(), width, height, SDL_WINDOW_RESIZABLE);
+  if (!m_window){
+    throw  std::runtime_error(SDL_GetError());
+  }
+
+  m_renderer = SDL_CreateRenderer(m_window, nullptr);
+  if (!m_renderer){
+    SDL_DestroyWindow(m_window);
+    throw  std::runtime_error(SDL_GetError());
+  }
+
+}
