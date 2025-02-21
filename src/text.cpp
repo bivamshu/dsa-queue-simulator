@@ -26,6 +26,19 @@ void Text::setText(const std::string& text, SDL_Color color){
     createTexture();
 }
 
+void Text::render(int x, int y) const {
+    if (!m_texture) return;
+
+    SDL_FRect dstRect = {
+        static_cast<float>(x),
+        static_cast<float>(y),
+        static_cast<float>(m_width),
+        static_cast<float>(m_height)
+    };
+
+    SDL_RenderTextureRotated(m_renderer, m_texture, nullptr, &dstRect, 0.0, nullptr, SDL_FLIP_NONE);
+}
+
 void Text::createTexture() {
     destroyTexture();
 
