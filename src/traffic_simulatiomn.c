@@ -500,3 +500,59 @@ void updateVehicle(Vehicle *vehicle, TrafficLight *lights)
         vehicle->active = false;
     }
 }
+
+void renderRoads(SDL_Renderer *renderer)
+{
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); // Gray color for roads
+
+    // Draw the intersection
+    SDL_Rect intersection = {INTERSECTION_X - LANE_WIDTH, INTERSECTION_Y - LANE_WIDTH, LANE_WIDTH * 2, LANE_WIDTH * 2};
+    SDL_RenderFillRect(renderer, &intersection);
+
+    // Draw main roads
+    SDL_Rect verticalRoad1 = {INTERSECTION_X - LANE_WIDTH, 0, LANE_WIDTH * 2, INTERSECTION_Y - LANE_WIDTH};
+    SDL_Rect verticalRoad2 = {INTERSECTION_X - LANE_WIDTH, INTERSECTION_Y + LANE_WIDTH, LANE_WIDTH * 2, WINDOW_HEIGHT - INTERSECTION_Y - LANE_WIDTH};
+    SDL_Rect horizontalRoad1 = {0, INTERSECTION_Y - LANE_WIDTH, INTERSECTION_X - LANE_WIDTH, LANE_WIDTH * 2};
+    SDL_Rect horizontalRoad2 = {INTERSECTION_X + LANE_WIDTH, INTERSECTION_Y - LANE_WIDTH, WINDOW_WIDTH - INTERSECTION_X - LANE_WIDTH, LANE_WIDTH * 2};
+    SDL_RenderFillRect(renderer, &verticalRoad1);
+    SDL_RenderFillRect(renderer, &verticalRoad2);
+    SDL_RenderFillRect(renderer, &horizontalRoad1);
+    SDL_RenderFillRect(renderer, &horizontalRoad2);
+
+    // Draw lane dividers
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White color for lane dividers
+
+    // Vertical lane dividers (left and right of the intersection)
+    for (int y = 0; y < WINDOW_HEIGHT; y++)
+    {
+        if (y < INTERSECTION_Y - LANE_WIDTH || y > INTERSECTION_Y + LANE_WIDTH)
+        {
+            // Left lane divider
+            SDL_RenderDrawPoint(renderer, INTERSECTION_X - LANE_WIDTH / 2 - 1, y);
+            // Right lane divider
+            SDL_RenderDrawPoint(renderer, INTERSECTION_X + LANE_WIDTH / 2 - 1, y);
+        }
+    }
+
+    // Horizontal lane dividers (above and below the intersection)
+    for (int x = 0; x < WINDOW_WIDTH; x++)
+    {
+        if (x < INTERSECTION_X - LANE_WIDTH || x > INTERSECTION_X + LANE_WIDTH)
+        {
+            // Top lane divider
+            SDL_RenderDrawPoint(renderer, x, INTERSECTION_Y - LANE_WIDTH / 2 - 1);
+            // Bottom lane divider
+            SDL_RenderDrawPoint(renderer, x, INTERSECTION_Y + LANE_WIDTH / 2 - 1);
+        }
+    }
+
+    // Add stop lines
+    SDL_Rect northStop = {INTERSECTION_X - LANE_WIDTH, INTERSECTION_Y - LANE_WIDTH - STOP_LINE_WIDTH, LANE_WIDTH * 2, STOP_LINE_WIDTH};
+    SDL_Rect southStop = {INTERSECTION_X - LANE_WIDTH, INTERSECTION_Y + LANE_WIDTH, LANE_WIDTH * 2, STOP_LINE_WIDTH};
+    SDL_Rect eastStop = {INTERSECTION_X + LANE_WIDTH, INTERSECTION_Y - LANE_WIDTH, STOP_LINE_WIDTH, LANE_WIDTH * 2};
+    SDL_Rect westStop = {INTERSECTION_X - LANE_WIDTH - STOP_LINE_WIDTH, INTERSECTION_Y - LANE_WIDTH, STOP_LINE_WIDTH, LANE_WIDTH * 2};
+    SDL_RenderFillRect(renderer, &northStop);
+    SDL_RenderFillRect(renderer, &southStop);
+    SDL_RenderFillRect(renderer, &eastStop);
+    SDL_RenderFillRect(renderer, &westStop);
+}
