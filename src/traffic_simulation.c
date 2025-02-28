@@ -87,3 +87,20 @@ typedef struct {
     Node* rear;
     int size;
 } Queue;
+
+extern Queue laneQueues[4];
+
+// Function declarations
+void initializeTrafficLights(TrafficLight* lights);
+void updateTrafficLights(TrafficLight* lights);
+Vehicle* createVehicle(Direction direction);
+void updateVehicle(Vehicle* vehicle, TrafficLight* lights);
+void renderSimulation(SDL_Renderer* renderer, Vehicle* vehicles, TrafficLight* lights, Statistics* stats);
+void renderRoads(SDL_Renderer* renderer);
+void renderQueues(SDL_Renderer* renderer);
+
+// Queue functions
+void initQueue(Queue* q);
+void enqueue(Queue* q, Vehicle vehicle);
+Vehicle dequeue(Queue* q);
+int isQueueEmpty(Queue* q);
