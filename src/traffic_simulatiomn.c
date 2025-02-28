@@ -556,3 +556,54 @@ void renderRoads(SDL_Renderer *renderer)
     SDL_RenderFillRect(renderer, &eastStop);
     SDL_RenderFillRect(renderer, &westStop);
 }
+
+void renderQueues(SDL_Renderer *renderer)
+{
+    for (int i = 0; i < 4; i++)
+    {
+        int x = 10 + i * 200; // Adjust position for each lane
+        int y = 10;
+        Node *current = laneQueues[i].front;
+        while (current != NULL)
+        {
+            SDL_Rect vehicleRect = {x, y, 30, 30};
+            SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // Blue color for vehicles
+            SDL_RenderFillRect(renderer, &vehicleRect);
+            y += 40; // Move down for the next vehicle
+            current = current->next;
+        }
+    }
+}
+
+void renderSimulation(SDL_Renderer *renderer, Vehicle *vehicles, TrafficLight *lights, Statistics *stats)
+{
+    SDL_SetRenderDrawColor(renderer, 177, 177, 177, 255);  // Brighter background color
+    SDL_RenderClear(renderer);
+
+    // Render roads
+    renderRoads(renderer);
+
+    // Render traffic lights
+    for (int i = 0; i < 4; i++)
+    {
+        SDL_SetRenderDrawColor(renderer, 64, 64, 64, 255); // Dark gray for housing
+        SDL_RenderFillRect(renderer, &lights[i].position);
+        SDL_SetRenderDrawColor(renderer, (lights[i].state == RED) ? 255 : 0, (lights[i].state == GREEN) ? 255 : 0, 0, 255);
+        SDL_RenderFillRect(renderer, &lights[i].position);
+    }
+
+    // Render vehicles
+    for (int i = 0; i < MAX_VEHICLES; i++)
+    {
+        if (vehicles[i].active)
+        {
+            SDL_SetRenderDrawColor(renderer, VEHICLE_COLORS[vehicles[i].type].r, VEHICLE_COLORS[vehicles[i].type].g, VEHICLE_COLORS[vehicles[i].type].b, VEHICLE_COLORS[vehicles[i].type].a);
+            SDL_RenderFillRect(renderer, &vehicles[i].rect);
+        }
+    }
+
+    // Render queues
+    renderQueues(renderer);
+
+    SDL_RenderPresent(renderer);
+}
