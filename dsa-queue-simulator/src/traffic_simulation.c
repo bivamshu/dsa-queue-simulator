@@ -528,26 +528,26 @@ void renderRoads(SDL_Renderer *renderer)
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // White color for lane dividers
 
     // Vertical lane dividers (left and right of the intersection)
-    for (int y = 0; y < WINDOW_HEIGHT; y++)
+    for (int y = 0; y < WINDOW_HEIGHT; y += 20) // Increment by 20 to create dashes
     {
         if (y < INTERSECTION_Y - LANE_WIDTH || y > INTERSECTION_Y + LANE_WIDTH)
         {
-            // Left lane divider
-            SDL_RenderDrawPoint(renderer, INTERSECTION_X - LANE_WIDTH / 2 - 1, y);
-            // Right lane divider
-            SDL_RenderDrawPoint(renderer, INTERSECTION_X + LANE_WIDTH / 2 - 1, y);
+            // Left lane divider (dashed)
+            SDL_RenderDrawLine(renderer, INTERSECTION_X - LANE_WIDTH / 2 - 1, y, INTERSECTION_X - LANE_WIDTH / 2 - 1, y + 10); // Draw a 10-pixel dash
+            // Right lane divider (dashed)
+            SDL_RenderDrawLine(renderer, INTERSECTION_X + LANE_WIDTH / 2 - 1, y, INTERSECTION_X + LANE_WIDTH / 2 - 1, y + 10); // Draw a 10-pixel dash
         }
     }
 
     // Horizontal lane dividers (above and below the intersection)
-    for (int x = 0; x < WINDOW_WIDTH; x++)
+    for (int x = 0; x < WINDOW_WIDTH; x += 20) // Increment by 20 to create dashes
     {
         if (x < INTERSECTION_X - LANE_WIDTH || x > INTERSECTION_X + LANE_WIDTH)
         {
-            // Top lane divider
-            SDL_RenderDrawPoint(renderer, x, INTERSECTION_Y - LANE_WIDTH / 2 - 1);
-            // Bottom lane divider
-            SDL_RenderDrawPoint(renderer, x, INTERSECTION_Y + LANE_WIDTH / 2 - 1);
+            // Top lane divider (dashed)
+            SDL_RenderDrawLine(renderer, x, INTERSECTION_Y - LANE_WIDTH / 2 - 1, x + 10, INTERSECTION_Y - LANE_WIDTH / 2 - 1); // Draw a 10-pixel dash
+            // Bottom lane divider (dashed)
+            SDL_RenderDrawLine(renderer, x, INTERSECTION_Y + LANE_WIDTH / 2 - 1, x + 10, INTERSECTION_Y + LANE_WIDTH / 2 - 1); // Draw a 10-pixel dash
         }
     }
 
@@ -582,7 +582,7 @@ void renderQueues(SDL_Renderer *renderer)
 
 void renderSimulation(SDL_Renderer *renderer, Vehicle *vehicles, TrafficLight *lights, Statistics *stats)
 {
-    SDL_SetRenderDrawColor(renderer, 177, 177, 177, 255);  // Brighter background color
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);  // White background color
     SDL_RenderClear(renderer);
 
     // Render roads
@@ -591,10 +591,41 @@ void renderSimulation(SDL_Renderer *renderer, Vehicle *vehicles, TrafficLight *l
     // Render traffic lights
     for (int i = 0; i < 4; i++)
     {
+        // Draw the housing for the traffic light (a single rectangle)
         SDL_SetRenderDrawColor(renderer, 64, 64, 64, 255); // Dark gray for housing
         SDL_RenderFillRect(renderer, &lights[i].position);
-        SDL_SetRenderDrawColor(renderer, (lights[i].state == RED) ? 255 : 0, (lights[i].state == GREEN) ? 255 : 0, 0, 255);
-        SDL_RenderFillRect(renderer, &lights[i].position);
+
+        // Calculate positions for the red and green lights
+        SDL_Rect redLight = lights[i].position;
+        SDL_Rect greenLight = lights[i].position;
+
+        // Adjust the positions of the red and green lights
+        if (lights[i].direction == DIRECTION_NORTH || lights[i].direction == DIRECTION_SOUTH)
+        {
+            // Vertical traffic light: red on top, green at bottom
+            redLight.y = lights[i].position.y;
+            greenLight.y = lights[i].position.y + lights[i].position.h;
+        }
+        else
+        {
+            // Horizontal traffic light: red on left, green on right
+            redLight.x = lights[i].position.x;
+            greenLight.x = lights[i].position.x + lights[i].position.w;
+        }
+
+        // Draw the red light (if active)
+        if (lights[i].state == RED)
+        {
+            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red color
+            SDL_RenderFillRect(renderer, &redLight);
+        }
+
+        // Draw the green light (if active)
+        if (lights[i].state == GREEN)
+        {
+            SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green color
+            SDL_RenderFillRect(renderer, &greenLight);
+        }
     }
 
     // Render vehicles
